@@ -1,0 +1,447 @@
+\documentclass{beamer}
+
+\mode<presentation>
+\usetheme{Madrid}
+\definecolor{Columbia}{RGB}{185,217,235}
+\definecolor{Columbia2}{RGB}{0,51,160}
+\definecolor{Columbia3}{RGB}{0,114,206}
+\setbeamercolor{title}{fg=Columbia2}
+\setbeamercolor{frametitle}{fg=Columbia2}
+\setbeamercolor{block title}{bg=Columbia, fg=Columbia2}
+%\setbeamercolor{block body}{fg=Columbia2}
+\setbeamercolor{structure}{fg=Columbia}
+\setbeamercolor{item projected}{fg=white}
+\setbeamercolor{item}{fg=Columbia2}
+\setbeamercolor{subitem}{fg=Columbia2}
+\setbeamercolor{section in toc}{fg=Columbia}
+\setbeamercolor{description item}{fg=Columbia}
+\setbeamercolor{caption name}{fg=Columbia}
+\usepackage{graphics}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{multirow, makecell}
+\usepackage{float}
+\usepackage{fancyvrb}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{adjustbox}
+\usepackage{hyperref}
+
+%\hypersetup{
+%colorlinks=true,
+%linkcolor=black,
+%filecolor=green, 
+%urlcolor=blue,
+%}
+\beamertemplatenavigationsymbolsempty
+\setbeamertemplate{footline}[page number]
+\setbeamercolor{page number in head/foot}{fg=black}
+\setbeamertemplate{headline}{}
+\makeatletter
+\let\@@magyar@captionfix\relax
+\makeatother
+
+
+\title[Econometrics 2]{Introduction to Econometrics 2: Recitation 2} % Change this regularly
+\author{Seung-hun Lee}
+\institute{Columbia University}
+
+\date{January 29th, 2020}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Classical Linear Models}
+Ordinary Least Squares
+\begin{itemize}
+\item Assume a data generating process 
+\[
+y_i = x_i'\beta+e_i, \ x_i = \begin{pmatrix} x_{i1} \\ ... \\ x_{ik}\end{pmatrix}, \ i=1,...,n
+\]
+\item To show consistency and limiting distributions, we need this set of assumptions
+\begin{block}{Assumption}
+\begin{itemize}
+\item[A1] $(y_i, x_i)$ are IID across $i$'s
+\item[A2] $E(x_ie_i)=0$
+\begin{itemize}
+\item[A2'] $E(e_i|x_i)=0$ 
+\end{itemize}
+\item[A3] $E(x_ix_i')=Q$ is a positive definite matrix (hereafter PD matrix)
+\item[A4] $E||x_i^4||<\infty, E||y_i^4||<\infty$
+\end{itemize}
+\end{block}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Classical Linear Models}
+Consistency and Limiting Distributions
+\begin{block}{Theorem}
+\begin{itemize}
+\item \textbf{Consistency}: Under assumptions \textbf{A1-A3}, $\hat{\beta}\xrightarrow{p}\beta$
+\item \textbf{Limiting Distribution}: Under assumptions \textbf{A1-A4}, the limiting distribution of $\hat{\beta}$ is characterized by $\sqrt{n}(\hat{\beta}-\beta)\xrightarrow{d}N(0,Q^{-1}\Omega Q^{-1})$ , where $\Omega = E(x_ix_i'e_i^2)$
+\end{itemize}
+\end{block}
+Proof: On separate pages!
+\begin{itemize}
+\item When we are interested in the limiting distribution of a particular element of $\beta$, then we work with
+\[
+\sqrt{n}(\hat{\beta}_j-\beta_j) \xrightarrow{d} N(0,V_{jj}) \ (V_{jj} \text{ is the $(j,j)$th element of V})
+\]
+where $V=Q^{-1}\Omega Q^{-1}$ and $V_{jj}$ is the $(j,j)$th element of $V$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Classical Linear Models}
+Hypothesis tests
+\begin{itemize}
+\item \textbf{Single element}: Consider the following setting
+\[
+H_0: \beta_j = \beta_j^0, \ \ H_1:\beta_j \neq \beta_j^0
+\]
+From the limiting distribution of $\beta_j$, we can show that the test statistic is distributed as a standard normal under $H_0$.  It is characterized as
+\[
+\frac{\hat{\beta}_j-\beta_j^0}{\sqrt{\widehat{V}_{jj}/n}}\xrightarrow{d}N(0,1)
+\]
+where $\widehat{V}$ is estimated version of the variance (more on that later). 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Classical Linear Models}
+Hypothesis tests
+\begin{itemize}
+\item \textbf{Multiple element}: We may be interested in the features of the linear combinations of the elements of $\beta$, or even multiple restrictions, Let $R\in\mathbb{R}^{k\times r}$ characterize such restrictions. Then we can write
+\[
+H_0 : R'\beta = c, \ \ H_1: \lnot H_0
+\]
+Then from the limiting distribution of $\hat{\beta}$, we can apply Slutsky's theorem to get the necessary limiting distribution
+\[
+\sqrt{n}(R'\hat{\beta}-R'\beta)=\sqrt{n}R'(\hat{\beta}-\beta)\xrightarrow{d}N(0,R'VR)
+\]
+Since $ R'\beta = c$ under $H_0$,  we can obtain the following Wald test statistic. (For convenience, we also assume that $V$ is known)
+\[
+n(R'\hat{\beta}-c)'(R'VR)^{-1}(R'\hat{\beta}-c)\xrightarrow{d}\chi^2_r
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Classical Linear Models}
+Notes on $\widehat{V}$
+\begin{itemize}
+\item The definition of $\widehat{V}$ is $\widehat{V}\equiv\widehat{Q}^{-1}\widehat{\Omega}\widehat{Q}^{-1}$, where
+\begin{itemize}
+\item $\widehat{Q}$ is a sample analogue of $Q$, written as $\frac{1}{n}\sum_{i=1}^nx_ix_i'$
+\item $\widehat{\Omega}$ is a sample analogue of $E(x_ix_i'e_i^2)$, also with the consideration that the true value of $e_i$ is replaced with the residual $\hat{e}_i$. Therefore, we can write $\frac{1}{n}\sum_{i=1}^nx_ix_i'\hat{e}_i^2$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Motivation and Sources of Endogeneity
+\begin{itemize}
+\item In showing consistency of $\hat{\beta}_{OLS}$, assumption \textbf{A2}: $E(x_ie_i)=0$ was crucial
+\item However, if this assumption cannot be supported by the data for whatever reasons, OLS estimators may no longer be consistent.
+\item Sources of Endogeneity
+\begin{enumerate}
+\item (Classical) Measurement Error
+\item Simultaneity Bias
+\item Omitted Variable Bias (OVB)
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Measurement Error
+\begin{itemize}
+\item Suppose that the linear model we want to estimate is as follows
+\[
+y_i = {x_i}^{*'}\beta+e_i \ (\text{We assume }E({x_i}^{*}e_i)=0)
+\]
+However, we cannot observe $x_i^*$.
+\item Instead, we can observe $x_i=x_i^*+v_i$, where $v_i$ has mean zero and independent of both $x_i^*$ and $e_i$.
+\item What we regress:
+\[
+\begin{aligned}
+y_i &= (x_i-v_i)'\beta+e_i &=x_i'\beta \underbrace{-v_i'\beta+e_i}_{=u_i} \\
+\end{aligned}
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Measurement Error
+\begin{itemize}
+\item Then, what happens to $E(x_iu_i)?$
+\[
+E(x_iu_i)=E[x_i(-v_i'\beta+e_i)]=E[(x_i^{*}+v_i)(-v_i'\beta+e_i)]=-E(v_iv_i')\beta
+\]
+\item So unless $\beta=0$ or $E(v_iv_i')=0$, $E(x_iu_i)\neq0$
+\begin{itemize}
+\item $\beta=0$ implies that $x_i^*$ has no role in determining $y_i$ to begin with
+\item $E(v_iv_i')=0$ implies that $var(v_i)=0$, so that $v_i$ has mean 0 and has point mass at 0 - no measurement error!
+\end{itemize}
+\item The probability limit of the OLS estimator is no longer $\beta$.  
+\begin{itemize}
+\item It converges in probability to $\frac{E(x_i^*x_i^{*'})}{E(x_i^*x_i^{*'})+E(v_iv_i')}\beta $. This is an \textbf{attenuation bias}.
+\item Proof: separate page!
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Some Comments on Measurement errors
+\begin{itemize}
+\item If there exists another noisy, but unbiased measure of $x_i^*$, namely $w_i=x_i^*+\delta_i$, we can use $w_i$ to instrument for $x_i$. The condition is that $\eta_i$ has mean zero and uncorrelated with $(x_i^*, e_i. v_i)$. Try verifying that this satisfies all IV conditions. 
+\item If there is a measurement error in $y_i$, the only this it does is to change the component of $e_i$. Assuming all the old assumptions hold, this does not pose as much problem as having a measurement error in the regressor. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Simultaneity Bias
+\begin{itemize}
+\item A classic example of this would be a supply and demand system type of setting:
+\begin{gather*}
+q_i = \beta_1p_i+u_i \tag{Supply}\\
+q_i = -\beta_2p_i+v_i \tag{Demand}
+\end{gather*}
+I will assume $e_i = (u_i \ v_i)'$ is IID, $E(e_i)=0, E(e_ie_i')=I_{2}$
+When you do some algebra, the equilibrium of this system is 
+\[
+p_i = \frac{v_i-u_i}{\beta_1+\beta_2}, q_i = \frac{\beta_1v_i + \beta_2u_i}{\beta_1+\beta_2}
+\]
+So for both supply and demand equations, we have $E(p_iu_i)\neq0$ and $E(p_iv_i)\neq0$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Simultaneity Bias
+\begin{itemize}
+\item When naively applying OLS to this equation, the result is as follows. 
+\[
+q_i=\beta^*p_i+\eta_i, \ E(p_i\eta_i)=0 
+\]
+\[
+\implies \hat{\beta}^*=\frac{E(p_iq_i)}{E(p_i^2)}=\frac{\beta_1-\beta_2}{2}
+\]
+Thus, OLS estimators does not converge to either one of $\beta_1$ or $\beta_2$, resulting in a \textbf{simultaneity bias}.  
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Omitted Variable Bias
+\begin{itemize}
+\item Suppose that we are interested in the determinant of wages ($y_i$). Also assume that education, $x_i$, and innate ability,  $a_i$, determine wages in the following manner
+\[
+y_ i = x_i\beta_1+a_i\beta_2+e_i, \ \ E(x_ie_i)=0, E(a_ie_i)=0
+\]
+\item However, instead of observing $(y_i,x_i,a_i)$, we can only observe $(y_i, x_i)$. the best we can do at the moment is to estimate the following equation
+\[
+y_i=x_i\beta_1+u_i,\text{ where } u_i=a_i\beta_2 + e_i
+\] 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Omitted Variable Bias
+\begin{itemize}
+\item Then $E(x_iu_i)$ becomes
+\[
+E(x_iu_i)= E(x_i(a_i\beta_2+e_i))=E(x_ia_i)\beta_2+0 = E(x_ia_i)\beta_2
+\]
+\item Therefore, when 
+\begin{itemize}
+\item $x_i$ and $a_i$ are correlated and 
+\item $\beta_2\neq0$,
+\end{itemize}
+ $x_i$ is endogenous with respect to $u_i$. 
+ \item Moreover, the OLS estimator acquired here has a probability limit of
+\[
+\hat{\beta}_{OLS}=\beta_1+E(x_i^2)^{-1}E(x_iu_i)=\beta_1+E(x_i^2)^{-1}E(x_ia_i)\beta_2
+\]
+So if both conditions occur, the above does not converge in probability to $\beta_1$. 
+\item we can determine the direction of the bias by the sign of $E(x_ia_i)$ and $\beta_2$. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+IV Estimator
+\begin{itemize}
+\item Assume that the data generating process is as follows
+\[
+y_i = x_{1i}'\beta_1+x_{2i}'\beta_2+e_i
+\]
+where $E(x_{1i}e_i)=0, E(x_{2i}e_i)\neq0$
+\item OLS estimators of $\beta_2$ and $\beta_1$ will not be consistent.
+\item Let $z_i\in\mathbb{R}^l = \begin{pmatrix}z_{1i} \\ z_{2i}\end{pmatrix}=\begin{pmatrix}x_{1i} \\ z_{2i}\end{pmatrix}$, where $\dim(z_{2i})=l-k_1$.
+\item Valid IV should satisfy
+\begin{block}{IV Conditions}
+\begin{enumerate}
+\item \textbf{Exogeneity}: $E(z_ie_i)=0$
+\begin{enumerate}
+\item \textbf{Exclusion}: $E(z_iy_i)=\beta_1E(z_ix_{1i})+\beta_2E(z_ix_{2i})$, in other words, $z_i$ should impact $y_i$ through $x_{1i}$ and $x_{2i}$
+\end{enumerate}
+\item \textbf{Relevancy}: $rank[E(z_ix_i')]=\dim(x_i)=k$
+\item \textbf{PD}: $E(z_iz_i')>0$
+\end{enumerate}
+\end{block}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Reduced Form
+\begin{itemize}
+\item In this approach, we assume that $z_i$ is a least squares projection. So we can write
+\begin{gather*}
+x_i = \Gamma'z_i+u_i \ (\Gamma\in\mathbb{R}^{l\times k})\\
+\implies z_ix_i'=z_iz_i'\Gamma+z_iu_i'\\
+\implies E(z_ix_i')=E(z_iz_i')\Gamma+E(z_iu_i')
+\end{gather*}
+\item Since $z_i$ is a least squares projection, $E(z_iu_i)=0$
+\item As a result, $\Gamma= E(z_iz_i')^{-1}E(z_ix_i')$ and the estimator for $\Gamma$ would be its sample analogue, 
+\[
+\widehat{\Gamma}=\left(\frac{1}{n}\sum_{i=1}^nz_iz_i'\right)^{-1}\left(\frac{1}{n}\sum_{i=1}^nz_ix_i'\right)=(Z'Z)^{-1}(Z'X)
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Reduced Form
+\begin{itemize}
+\item Then we get to the structural equation 
+\[
+y_i=x_i'\beta+e_i \iff y_i =(z_i'\Gamma+u_i')\beta+e_i \iff y_i = z_i'\underbrace{\Gamma\beta}_{=\lambda}+\underbrace{u_i'\beta+e_i}_{=v_i}
+\]
+\item From the assumptions, we can show that $E(z_iv_i)=0$. As such, 
+\[
+\lambda=E(z_iz_i')^{-1}E(z_iy_i)
+\]
+with its sample analogue being 
+\[
+\hat{\lambda}=\left(\frac{1}{n}\sum_{i=1}^n z_iz_i'\right)^{-1} \left(\frac{1}{n}\sum_{i=1}^n z_iy_i\right)=(Z'Z)^{-1}Z'y
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Reduced Form
+\begin{itemize}
+\item In case where $k=l$, $Z$ itself becomes invertible. Then we can show that $\beta=\Gamma^{-1}\lambda$ and thus 
+\[
+\hat{\beta}_{IV}=(Z'X)^{-1}Z'y
+\]
+\item If otherwise, We note that $\widehat{\Gamma}\beta+\text{error}=\hat{\lambda}$ and show that 
+\[
+\hat{\beta}_{IV}=(\widehat{\Gamma}'\widehat{\Gamma})^{-1}\widehat{\Gamma}'\hat{\lambda}
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+2SLS Estimator
+\begin{itemize}
+\item  Suppose the structural equation and the first-stage regression is as follows.
+\begin{gather*}
+y=X\beta+e \tag{Structural}\\
+X=Z\Gamma+u \tag{First Stage}
+\end{gather*}
+where $Z\in\mathbb{R}^{n\times l},\Gamma\in\mathbb{R}^{l\times k}$
+\item We still maintain the least square projection assumption
+\item We proceed as follows
+\begin{enumerate}
+\item Regress the first stage and obtain $\widehat{\Gamma}=(Z'Z)^{-1}Z'X$. Then the predicted value of $X$, denoted as $\widehat{X}=Z(Z'Z)^{-1}Z'X=P_ZX$.
+\item In the structural equation, replace $X$ with $\widehat{X}$ and obtain
+\[
+\begin{aligned}
+\hat{\beta}_{2SLS}&=(\widehat{X}'\widehat{X})^{-1}\widehat{X}'y=(X'P_Z'P_ZX)^{-1}(X'P_Z'y)\\
+&=(X'P_ZX)^{-1}X'P_Zy =(\widehat{X}'X)^{-1}\widehat{X}'y\\
+\end{aligned}
+\]
+which is effectively replacing $Z$ in the previous approach with $\widehat{X}$. 
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Consistency and the Limiting Distribution of 2SLS Estimator
+\begin{itemize}
+\item  To proceed, we need these assumptions
+\begin{block}{2SLS Assumptions}
+\begin{itemize}
+\item[T1] $(y_i, x_i, z_i)$ are IID
+\item[T2] Finite second moments: $E||y_i^2||<\infty, E||x_i^2||<\infty, E||z_i^2||<\infty$
+\item[T3] $E(z_iz_i')>0$
+\item[T4] $rank[E(z_ix_i')]=k$
+\item[T5] $E(z_ie_i)=0$
+\item[T6] Finite fourth moments: $E||y_i^4||<\infty, E||x_i^4||<\infty, E||z_i^4||<\infty$
+\item[T7] $E(z_iz_i'e_i^2)=\Omega>0$
+\end{itemize}
+\end{block}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Consistency and the Limiting Distribution of 2SLS Estimator
+\begin{block}{Theorem}
+\begin{itemize}
+\item \textbf{Consistency}: Under assumptions \textbf{T1-T5}, $\hat{\beta}_{2SLS}\xrightarrow{p}\beta$
+\item \textbf{Limiting Distribution}: Under assumptions \textbf{T1-T7}, the limiting distribution of $\hat{\beta}$ is characterized by $\sqrt{n}(\hat{\beta}-\beta)\xrightarrow{d}N(0,V_\beta)$, where 
+\[
+V_\beta= (Q_{ZX}'Q_{ZZ}^{-1}Q_{ZX})^{-1}Q_{ZX}'Q_{ZZ}^{-1}\Omega Q_{ZZ}^{-1}Q_{ZX}(Q_{ZX}'Q_{ZZ}^{-1}Q_{ZX})^{-1}
+\]
+\end{itemize}
+\end{block}
+Proof: On separate pages!
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Remarks
+\begin{itemize}
+\item \textbf{Correct Standard Errors} When estimating $\Omega=E(z_iz_i'e_i^2)$, we are not aware of the true error. So we need to estimate this as well. Note that we need to use a proper residual. Namely, we must use
+\[
+\hat{e}_i = y_i - x_i'\hat{\beta}_{2SLS}
+\]
+This is correct, as $\hat{\beta}_{2SLS}\xrightarrow{p}\beta$. However, we frequently make a mistake of using
+\[
+\tilde{e}_i = y_i - \hat{x}_i'\hat{\beta}_{2SLS}
+\]
+Since $\hat{x}_i$ is not exactly $x_i$, this converges in probability to something else. 
+\begin{itemize}
+\item Try this on STATA
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Remarks
+\begin{itemize}
+\item \textbf{Nonlinear Extension}: If we are instead interested in the properties of $g(\hat{\beta}_{2SLS})$, where $g(\cdot)$ is not necessarily nonlinear, we can apply delta method here. 
+\item \textbf{Too Many IV?}: In practice, when we have too many IV's (large dimension for $z_i$), it may be possible for the instruments to 'perfectly' predict $x_i$. In other words, $\hat{x}_i$ becomes nearly identical to $x_i$. This can become a problem because the endogeneity bias that plagued original structural equation may not be mitigated. \\
+One way of getting around this is to use a regression method that involves penalty mechanism - like LASSO, for instance. We will also formally treat this issue when we learn over-identification tests in the near future. 
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%
+\end{document}

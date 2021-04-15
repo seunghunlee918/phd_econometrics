@@ -1,0 +1,354 @@
+\documentclass{beamer}
+
+\mode<presentation>
+\usetheme{Madrid}
+\definecolor{Columbia}{RGB}{185,217,235}
+\definecolor{Columbia2}{RGB}{0,51,160}
+\definecolor{Columbia3}{RGB}{0,114,206}
+\setbeamercolor{title}{fg=Columbia2}
+\setbeamercolor{frametitle}{fg=Columbia2}
+\setbeamercolor{block title}{bg=Columbia, fg=Columbia2}
+%\setbeamercolor{block body}{fg=Columbia2}
+\setbeamercolor{structure}{fg=Columbia}
+\setbeamercolor{item projected}{fg=white}
+\setbeamercolor{item}{fg=Columbia2}
+\setbeamercolor{subitem}{fg=Columbia2}
+\setbeamercolor{section in toc}{fg=Columbia}
+\setbeamercolor{description item}{fg=Columbia}
+\setbeamercolor{caption name}{fg=Columbia}
+\usepackage{graphics}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{multirow, makecell}
+\usepackage{float}
+\usepackage{fancyvrb}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{adjustbox}
+\usepackage{hyperref}
+
+%\hypersetup{
+%colorlinks=true,
+%linkcolor=black,
+%filecolor=green, 
+%urlcolor=blue,
+%}
+\beamertemplatenavigationsymbolsempty
+\setbeamertemplate{footline}[page number]
+\setbeamercolor{page number in head/foot}{fg=black}
+\setbeamertemplate{headline}{}
+\makeatletter
+\let\@@magyar@captionfix\relax
+\makeatother
+
+
+\title[Econometrics 2]{Introduction to Econometrics 2: Recitation 7} % Change this regularly
+\author{Seung-hun Lee}
+\institute{Columbia University}
+
+\date{March 4th, 2020}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Regressing with an overall intercept
+\begin{itemize}
+\item Consider the following model
+\[
+y_{it}=\mu+\rho y_{it-1}+x_{it}'\beta+\alpha_i + u_{it}
+\]
+where $\mu$ term represents an `overall' constant
+\item When we estimated $\rho$ and $\beta$ before, we relied on first-differencing at the expense of losing time-invariant terms
+\item How do we find $\mu?$
+\begin{enumerate}
+\item Two-step Approach
+\item Simultaneous Approach
+\end{enumerate}
+In both cases, assume $E[\alpha_i]=0$ (if not, demeaning required)
+\[
+y_{it}=\underbrace{\mu+E(\alpha_i)}_{\mu_0}+\rho y_{it-1}+x_{it}'\beta+\underbrace{\alpha_i-E(\alpha_i)}_{=\alpha_{0i}} + u_{it}
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Regressing with an overall intercept: Two-step
+\begin{itemize}
+\item We first obtain the estimate $\hat{\rho}$ and $\hat{\beta}$ using an AB estimator. 
+\item Then, we can rearrange the equation into
+\[
+y_{it}-\hat{\rho} y_{it-1}-x_{it}'\hat{\beta}=\mu+\alpha_i + u_{it}
+\]
+\item Given that the mean of $\alpha_i$ and $u_{it}$ is zero, we can use the sample mean of the left-hand-side to obtain the estimate for $\mu$
+\item Therefore, 
+\[
+\hat{\mu}=\frac{1}{nT}\sum_{i=1}^n \sum_{t=1}^T\left(y_{it}-\hat{\rho} y_{it-1}-x_{it}'\hat{\beta}\right)
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Regressing with an overall intercept: Simultaneous
+\begin{itemize}
+\item  Note that $\alpha_i + u_{it}$ has a zero mean
+\item Define $\mathbf{y}_i, \mathbf{y}_{i,-1}$ and $\mathbf{x}_i$ as stacked-up vector for $i$ with $T$ observations.
+\item We obtain
+\small{\begin{align*}
+\mathbf{y}_i =& 1_T\mu+\rho\mathbf{y}_{i,-1}+\mathbf{x}_i\beta+\underbrace{1_T\alpha_i + \mathbf{u}_i}_{=\mathbf{v}_i}\\
+&=1_T\mu+\mathbf{w}_i\delta+\mathbf{v}_i
+\end{align*}}\normalsize
+\item We make use of the following moment condition
+\[
+E[\mathbf{v}_i]=E[1_T\alpha_i + \mathbf{u}_i]=E[\mathbf{y}_i-\mathbf{w}_i\delta-1_T\mu]=0
+\]
+\item Along with the $E[Z_i'\Delta \mathbf{u}_i]=0$ condition, we can jointly write
+\[
+\begin{bmatrix}E(\mathbf{v}_i) \\ E(Z_i'\Delta \mathbf{u}_i) \end{bmatrix}=E\left[\begin{bmatrix}I_T & 0 \\ 0 & Z_i\end{bmatrix}'\begin{bmatrix}\mathbf{v}_i \\ \Delta\mathbf{u}_i \end{bmatrix}\right]
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Regressing with an overall intercept: Simultaneous
+\begin{itemize}
+\item Define \small{$\bar{Z}_i = \begin{bmatrix}I_T & 0 \\ 0 & Z_i\end{bmatrix}$, $\bar{W}_i=\begin{bmatrix}I_T & \mathbf{w}_i \\ 0 & \Delta\mathbf{w}_i\end{bmatrix}$, $\bar{Y}_i = \begin{bmatrix} \mathbf{y}_i \\ \Delta \mathbf{y}_i\end{bmatrix}$}\normalsize. Then $\begin{bmatrix}\mathbf{v}_i \\ \Delta\mathbf{u}_i \end{bmatrix}=\bar{Y}_i - \bar{W}\begin{bmatrix}\mu \\ \delta\end{bmatrix}$.
+\item The moment condition and the resulting estimator for $\begin{bmatrix}\mu \\ \delta\end{bmatrix}$ is ($\bar{V}_n$ is the weighting matrix)
+\footnotesize{\begin{gather*}
+E\left[\bar{Z}_i'(\bar{Y}_i-\bar{W}_i)\begin{bmatrix}\mu \\ \delta\end{bmatrix}\right]=0\\
+\begin{bmatrix}\hat{\mu} \\ \hat{\delta}\end{bmatrix}=\left[\sum_i(\bar{W}_i'\bar{Z}_i)\bar{V}_n\sum_i \bar{Z}_i'\bar{W}_i\right]^{-1}\sum_i(\bar{W}_i'\bar{Z}_i)\bar{V}_n\sum_i \bar{Z}_i'\bar{Y}_i
+\end{gather*}}\normalsize
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Subset of Regressors Uncorrelated with FE
+\begin{itemize}
+\item Return to the model where
+\[
+y_{it}=\mu+\rho y_{it-1}+x_{it}'\beta+\alpha_i + u_{it}
+\]
+\item Now that a subset of $x_{it}$ is exogenous with respect to  $\alpha_i$.
+\item Also assume that regressors are strictly exogenous
+\item Denote such variable as $x_{it}^{(1)}$. Then the following holds
+\[
+E[x_{is}^{(1)}\alpha_i]=0\implies E[x_{is}^{(1)}v_{it}]=0\implies E[x_{is}^{(1)}(y_{it}-w_{it}'\delta-\mu)]=0 \ \forall s,t
+\]
+\item Define $h_i = vec(x_i^{(1)})=\begin{bmatrix} x_{i1}^{(1)} \\ ... \\ x_{iT}^{(1)}\end{bmatrix}$. Then the above moment condition is equivalent to
+\[
+E[(I_T\otimes h_i)\mathbf{v}_i]=0
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Subset of Regressors Uncorrelated with FE
+\begin{itemize}
+\item We can also make use of the fact that $E[\mathbf{v}_i]=0$, which is $E[(I_T\otimes 1)\mathbf{v}_i]=0$. 
+\item This would give us the required moment condition for equations in levels (to back out $\mu$), expressed as
+\[
+E\left[\left(I_T\otimes \begin{bmatrix}1 \\h_i\end{bmatrix}\right)\mathbf{v}_i\right]=0
+\]
+\item Another set of required moment condition comes from $Z_i$ matrix defined for strictly exogenous case with $\mathbf{x}_{iT}'$ replaced with $vec(x_i^{(2)})'$.
+\item This gives us $E[Z_i'\Delta \mathbf{u}_i]=0$. The GMM estimator has the same expression as in the previous case but with $I_T$ in $\bar{Z}_i$ replaced with $\left(I_T\otimes \begin{bmatrix}1 \\h_i\end{bmatrix}\right)$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Nonlinear Moments
+\begin{itemize}
+\item Consider the model
+\[
+y_{it}=\rho y_{it-1}+\underbrace{\alpha_i +u_{it}}_{=v_{it}} 
+\]
+\item The assumptions on our variables were
+\begin{itemize}
+\item $E(\alpha_i)=0, E(u_{it})=0, E(\alpha_i u_{it})=0 \ \forall i,t$
+\item $E(u_{it}u_{is})=0\  t\neq s$
+\item $E(y_{i0}u_{it})=0 \ \forall i \ \text{and }t=1,..,T$
+\end{itemize}
+\item These three assumptions imply $E[\Delta v_{it-1}v_{it}]=0 \ t=3,..,T$. 
+\begin{itemize}
+\item Note that $\Delta v_{it-1}= u_{it-1}-u_{it-2}=\Delta u_{it-1}$, since $v_{it}=\alpha_i + u_{it}$.
+\item Since fixed effects is not correlated with the error terms and there is no serial correlation, $E[\Delta v_{it-1}v_{it}]=0$ holds. In other words, 
+\[
+E[(\Delta y_{it-1}-\rho\Delta y_{it-2})(y_{it}-\rho y_{it-1})]=0
+\]
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Nonlinear Moments
+\begin{itemize}
+\item The sample analogue of this would be
+\[
+\frac{1}{n}\sum_{i=1}^n (\Delta y_{it-1}y_{it}-\rho\Delta y_{it-1}y_{it-1}-\rho \Delta y_{it-2}y_{it}+\rho^2\Delta y_{it-2}y_{it-1})
+\]
+\item Notice the $\rho^2$ term here. Because of this, the moment condition becomes nonlinear (quadratic, to be exact).
+\item  If GMM estimation is used, the objective function involves $\rho^4$ and FOC would involve $\rho^3$. So it is tricky to work with.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Nonlinear Moments
+\begin{itemize}
+\item In addition, assume that there is a time series homoskedasticity, or $E[u_{it}^2]=\sigma_u^2$. 
+\item Then the following $T-1$ additional moments
+\begin{gather*}
+E[v_{it}^2]-E[v_{it-1}^2]=0, \ t=2,..,T\\
+\iff E[(y_{it}-\rho y_{it-1})^2]-E[(y_{it-1}-\rho y_{it-2})^2]=0
+\end{gather*}
+\item Similar to the previous case, the objective function involves $\rho^4$ and FOC has $\rho^3$. 
+\item This is again, tricky to work with. 
+\item There is one way to `linearize' the moment conditions. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Mean Stationarity
+\begin{itemize}
+\item Mean stationarity refers to the situation where the mean of a variable is time-invariant. One case where this can hold is as follows. Suppose
+\[
+y_{i0}=\frac{\alpha_i}{1-\rho}+e_{i0}
+\]
+\item Then $E[y_{i0}|\alpha_i]=\frac{\alpha_i}{1-\rho}$.
+\item  Under the data generating process
+\[
+y_{it}=\rho y_{it-1}+\alpha_i +u_{it}
+\]
+we can show that means stationarity holds
+\begin{align*}
+E[y_{i1}|\alpha_i]&= E[\rho y_{i0}+\alpha_i +u_{i1}|\alpha_i]\\
+&= \rho E[y_{i0}|\alpha_i]+\alpha_i + E[u_{i1}|\alpha_i]\\
+&= \frac{\rho\alpha_i}{1-\rho}+\alpha_i = \frac{\alpha_i}{1-\rho}
+\end{align*}
+\item We can reiterate and get the same result for $E[y_{it}|\alpha_i]$ for $t=1,...,T$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Mean Stationarity: Linearizing Moment Conditions
+\begin{itemize}
+\item Start with the first nonlinear moment $E[\Delta v_{it-1}v_{it}]=0$ or $E[(\Delta y_{it-1}-\rho\Delta y_{it-2})(y_{it}-\rho y_{it-1})]=0$. By mean stationarity, we get
+\[
+E[y_{it}-y_{it-1}|\alpha_i]=E[\Delta y_{it}|\alpha_i]=0 \implies E[\alpha_i \Delta y_{it}]=0 \ \forall t
+\]
+\item This result, along with $E[y_{i1}u_{is}]=0$ for $s\geq 2$ implies that $E[\Delta y_{i1}u_{is}]=0$ for $s\geq 2$.
+\item  Thus, $E[\Delta y_{i1}v_{is}]=0 \ (s\geq 2)$. So we have $E[\Delta y_{i1}v_{i2}]=0$. 
+\item For $s\geq 3$, we can use the nonlinear moment condition $E[\Delta v_{is-1}v_{is}]=0$ to back out
+\footnotesize{\begin{align*}
+E[\Delta v_{is-1}v_{is}]=0&\implies E[(\Delta y_{is-1}-\rho \Delta y_{is-2})v_{is}]=0\\
+(s=3)&\implies E[(\Delta y_{i2}-\rho\Delta y_{i1})v_{i3}]=0\\
+&=E[\Delta y_{i2}v_{i3}]=0 \ (\because E[\Delta y_{i1}v_{is}]=0 \ (s\geq 2)])
+\end{align*}}\normalsize
+Repeat the similar process to ultimately get $E[\Delta y_{it-1}v_{it}]=0$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Mean Stationarity: Linearizing Moment Conditions
+\begin{itemize}
+\item So the lagged differences of the instruments qualify as instruments for equation in levels. 
+\item This is a Blundell-Bond estimator, or what is known as a system GMM estimation. 
+\item Combine the above moment condition with the usual $E[Z_i'\Delta \mathbf{u}_i]=0$ to get a joint moment condition
+\[
+E\left[Z_i^{+'}\begin{pmatrix}\Delta \mathbf{u}_i \\ \mathbf{v}_i\end{pmatrix}\right]=0
+\]
+where $Z_i^+, \mathbf{v}_i$ are as defined in the recitation note
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics in Dynamic Panel Data}
+Mean Stationarity: Linearizing Moment Conditions
+\begin{itemize}
+\item As for the homoskedastic case, we can use the mean stationarity condition to obtain a linear moment condition
+\begin{align*}
+E[v_{it}^2]-E[v_{it-1}^2]&=E[(y_{it}-\rho y_{it-1})v_{it}-(y_{it-1}-\rho y_{it-2})v_{it-1}]\\
+&=E[y_{it}v_{it}-y_{it-1}v_{it-1}]=0 \ (t=2,...,T)
+\end{align*}
+\item The remaining terms can be written as
+\footnotesize{\begin{align*}
+E[-\rho y_{it-1} (\alpha_i + u_{it})+\rho y_{it-2}(\alpha_i+u_{it-1})]&=E[-\rho \Delta y_{it-1}\alpha_i +\rho y_{it-2}u_{it-1}-\rho y_{it-1}u_{it}]\\&=-0+0-0=0
+\end{align*}}\normalsize
+The mean stationarity justifies the first zero
+\item Therefore, using the combined moment condition
+\[
+E\left[Z_{iH}^{+'} \begin{pmatrix} \Delta \mathbf{u}_i \\ \mathbf{v}_i\end{pmatrix}\right]=0
+\]
+we can obtain a GMM estimator of $\rho$ ($Z_{iH}^+, \mathbf{v}_i$ are defined in reci notes)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Factor Analysis}
+Framework
+\begin{itemize}
+\item Consider the following model
+\[
+y_{it}=\mu_i+x_{it}'\beta + \lambda_i'f_t + u_{it}
+\]
+where $\lambda_i$ is a vector of factor loadings and $f_t$ is a vector of factors.
+\item  Each can be written
+\[
+\lambda_i = \begin{bmatrix}\lambda_{i1}\\ ... \\ \lambda_{ir} \end{bmatrix}, f_t = \begin{bmatrix}f_{1t}\\ ... \\ f_{rt} \end{bmatrix}
+\]
+where $r$ is usually a small number. 
+\item We will assume that only $y_{it}$ and $x_{it}$ is observable. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Factor Analysis}
+Framework
+\begin{itemize}
+\item In fact, we can see that this format is a generalized version of the additive fixed effect we have seen so far
+\begin{itemize}
+\item We can back out the two-way fixed effects model 
+\item We can capture unobserved individual traits that can vary with time. 
+\item We can also capture entity-level responses to a common shock at certain time.
+\end{itemize}
+\item If it is the case that we know $\beta$, then we can write
+\[
+y_{it}-x_{it}'\beta = \mu_i+\lambda_i'f_t + u_{it}
+\]
+and estimate pure factor models. 
+\item If we know what $\mu_i + \lambda_i'f_t$ is, we write
+\[
+y_{it}-\mu_i-\lambda_i'f_t = x_{it}'\beta+u_{it}
+\]
+which becomes a standard model.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Factor Analysis}
+Framework
+\begin{itemize}
+\item If we need to determine the parameters of interest all at once, we can do a LASSO-type regularized regression in the following sense. 
+\[
+\min \sum_i \sum_t (y_{it}-x_{it}'\beta-l_{it})^2 + \tau\Vert L \Vert_*
+\]
+where $l_{it}$ is the $\lambda_i'f_t$ and $L$ is the matrix of $l_{it}$'s.
+\item Note that we are applying a nuclear norm here. 
+\item In this context, what we are doing is to minimize the sum squared residuals but with the penalty that applies when the rank of $L$ is large. 
+\item Basically, we are treating $\beta, \lambda_i, f_t$ as a parameter to be estimated, whereas for the static dynamic model, our interest was on $\beta$\end{itemize}
+\end{frame}
+%%%%%%%%%%%
+\end{document}

@@ -1,0 +1,307 @@
+\documentclass{beamer}
+
+\mode<presentation>
+\usetheme{Madrid}
+\definecolor{Columbia}{RGB}{185,217,235}
+\definecolor{Columbia2}{RGB}{0,51,160}
+\definecolor{Columbia3}{RGB}{0,114,206}
+\setbeamercolor{title}{fg=Columbia2}
+\setbeamercolor{frametitle}{fg=Columbia2}
+\setbeamercolor{block title}{bg=Columbia, fg=Columbia2}
+%\setbeamercolor{block body}{fg=Columbia2}
+\setbeamercolor{structure}{fg=Columbia}
+\setbeamercolor{item projected}{fg=white}
+\setbeamercolor{item}{fg=Columbia2}
+\setbeamercolor{subitem}{fg=Columbia2}
+\setbeamercolor{section in toc}{fg=Columbia}
+\setbeamercolor{description item}{fg=Columbia}
+\setbeamercolor{caption name}{fg=Columbia}
+\usepackage{graphics}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{multirow, makecell}
+\usepackage{float}
+\usepackage{fancyvrb}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{adjustbox}
+\usepackage{hyperref}
+
+%\hypersetup{
+%colorlinks=true,
+%linkcolor=black,
+%filecolor=green, 
+%urlcolor=blue,
+%}
+\beamertemplatenavigationsymbolsempty
+\setbeamertemplate{footline}[page number]
+\setbeamercolor{page number in head/foot}{fg=black}
+\setbeamertemplate{headline}{}
+\makeatletter
+\let\@@magyar@captionfix\relax
+\makeatother
+
+
+\title[Econometrics 2]{Introduction to Econometrics 2: Recitation 13} % Change this regularly
+\author{Seung-hun Lee}
+\institute{Columbia University}
+
+\date{May 9th, 2020}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Bootstraps and Multiple Hypothesis Tests}
+Better ways to do asymptotics
+\begin{itemize}
+\item There are cases when we are not certain about the characteristics of the distribution that generated the data. 
+\item There are cases where we only know the asymptotic properties and not much about the finite sample properties. 
+\item In this context, taking an asymptotic approach can lead to inaccurate estimations
+\item Therefore, we can look into conducting a bootstrap estimation, which is at least as better as classical asymptotics and sometimes better
+\begin{itemize}
+\item Bootstrap estimation is also consistent and under some conditions, they have smaller approximation error.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Bootstraps and Multiple Hypothesis Tests}
+Better ways to do asymptotics
+\begin{itemize}
+\item We can conduct bootstraps by getting an IID sample $(X_1,...,X_n)$ from the data and treating this as a population sample.
+\item We obtain a $t$-statistics from this sample.
+\item We make $n$ draws with replacement and compute the new $t$-statistics.
+\item Re-draw the sample many times and keep track of each $t$-statistic.
+\item Then, generate an empirical distribution of these statistics and identify relevant cutoffs, $(2.5\%$ and $97.5\%)$ for instance, that can be used to create upper and lower bounds for the bootstrap CI.
+\item It can be shown, using Edgeworth expansion, that bootstrap approximation error and the classical approximation error have the same size of error, $O\left(1/\sqrt{n}\right)$.
+\item If the test statistic is (asymptotically) pivotal, then bootstrapped estimation can do better since they have smaller approximation error of $O\left(1/n\right)$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Bootstraps and Multiple Hypothesis Tests}
+Proper ways to run multiple tests
+\begin{itemize}
+\item When we are conducting multiple hypothesis tests naively, we can run into a mistake of making a false discovery - rejecting a true $H_0$ 
+\item This may lead to false discoveries
+\item FWE: Bonferroni and Holm
+\begin{itemize}
+\item Bonferroni method uniformly applies a lower $p$-value cutoff
+\item Holm method is a step-down method that considers from the hypothesis with the lowest $p$-value to the highest one
+\end{itemize}
+\item FDR: Benjamini-Hochberg (step-up)
+\begin{itemize}
+\item  Plot the actual $p$-values of each hypotheses and the relevant cutoff $p$-values used to reject/not reject the null hypothesis. \item We check whether the actual $p$-value lies above the cutoff, accept that $H_0$ as true and move on to the next highest hypothesis. 
+\item The process is stopped when the actual $p$-value starts to lie below the cutoff $p$-value. The remaining hypotheses are all considered to have a false $H_0$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Quantile Regression}
+Not everything is about conditional means
+\begin{itemize}
+\item We may be interested in not just the conditional expectation, but some other distributional properties
+\item  To answer this, we run a quantile regression that is meant to capture different values of the parameter of interest depending on the location of the conditional distribution.
+\item Check function $\rho_\tau(u)=u(\tau-1(u\leq0))$ is very useful. 
+\item For any $\tau$, there is going to be a kink for the check function at $u=0$.
+\item We make use of this property and obtain the quantile estimator by minimizing 
+\[
+E[\rho_\tau(Y_i-X_i\beta)|X_i] \text{ or }E[\rho_\tau(Y_i-X_i\beta)X_i]
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nonparametric Regression}
+Why do we even do this?
+\begin{itemize}
+\item We rarely have the exact knowledge about the characteristics of the distribution $P(y|x)$ that the observations are drawn from. \item When we carry out nonparametric estimation, we are not required to make any modeling assumptions related to the data.
+\item This helps address one of the key internal validity threats - using the wrong functional forms in the specification. 
+\item We can also use nonparametric regression in tandem with parametric estimation - Run the model parametrically and run the same model in nonparametrics to confirm whether our parametric form is correct
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nonparametric Regression}
+Bandwidth is essential!
+\begin{itemize}
+\item Form of kernel density does not matter much. In any case, we estimate density of $f$ with
+\[
+\hat{f}(x)=\frac{1}{nh}\sum_{i=1}^n K\left(\frac{x-X_i}{h}\right)
+\]
+where $K(\cdot)$ is the kernel density estimator of our choice. 
+\item Bandwidth, on the other hand, is essential
+\begin{itemize}
+\item When we undersmooth, we are including more variation than necessary and computation becomes difficult
+\item When we oversmooth, we risk dropping even the essential traits about the distribution and mis-estimate the true density
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nonparametric Regression}
+Bandwidth is essential!
+\begin{itemize}
+\item The key to finding the optimal bandwidth is to balance between the bias and the variance.
+\begin{itemize}
+\item  Wider bandwidth increases bias but decreases variance. 
+\item Narrower bandwidth does the opposite.
+\end{itemize}
+\item The answer can be found by minimizing the asymptotic mean integrated square error (AMISE)
+\[
+\int E(\hat{f}(x)-f(x))^2dx
+\]
+where $E(\hat{f}(x)-f(x))^2$ is the sum of variance and bias$^2$.
+\item  In practice, we can choose the bandwidth based on Silverman's rule of thumb or from cross-validation. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nonparametric Regression}
+What are the gains?
+\begin{itemize}
+\item One of the nonparametric methods we can use is local constant (Nadaraya and Watson Estimator), local linear, or local polynomial estimation.
+\item Key gains from nonparametrics compared to parametric estimation is the flexibility 
+\begin{itemize}
+\item The type of association between the covariates and the dependent variable is not bound by the functional form selected in parametric approach.
+\end{itemize}
+\item We can model flexible relationship with just nonparametric estimation (albeit with some errors, which is why having a confidence interval is necessary)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nonparametric Regression}
+The cost?
+\begin{itemize}
+\item Curse of dimensionality.
+\item As the dimension of covariates become larger, larger sample size is required to do any sort of asymptotic inference.
+\item Put it differently, the estimators converge to its asymptotic values in a much slower pace than in parametric setup.
+
+\item One of the middle grounds that is used in an attempt to have both traits of nonparametric and parametric regression is the semiparametric regression. In class, we learned partially linear models where we run
+\[
+Y_i = X_i\beta + g(W_i)+\epsilon_i
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Treatment Effect}
+Fundamental Problem in Treatment Effects
+\begin{itemize}
+\item We are interested in
+\[
+Y_i(1)-Y_i(0)
+\]
+\item Unfortunately, there are always a problem of a missing data - you cannot be treated and untreated at the same time.
+\item Specifically, if we are to identify what an average treatment effect is,
+\small{\begin{align*}
+E[Y_i(1)-Y_i(0)]&=\Pr(D_i=1)E[Y_i(1)|D_i=1]+\Pr(D_i=0)\textcolor{red}{E[Y_i(1)|D_i=0]}\\
+&-\Pr(D_i=0)E[Y_i(0)|D_i=0]-\Pr(D_i=1)\textcolor{red}{E[Y_i(0)|D_i=1]}
+\end{align*}}\normalsize
+\item We can get all the other conditional expectations from the data except the ones in red, preventing us from going further
+\item The type of assumptions we set determine what the conditional expectation in red can be expressed as.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Treatment Effect}
+Fundamental Problem in Treatment Effects
+\begin{itemize}
+\item The treated population and the untreated population may be different in some unobservable dimensions.
+\item In such case, conditioning the outcome on the treatment status alone would not give us an accurate assessment of the treatment effect.
+\item In such case, we are left to rely on instrumental variables to back out the treatment effect- MTE and LATE
+\item Depending on the assignment mechanism used, we may be able to use this to our advantage.
+\item If the assignment was based on some sort of a cutoff, then there is bound to be a jump in probability of being treated.
+\item  This discontinuity allows us to utilize regression discontinuity, one of the front-runner methods in applied economics. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Treatment Effect}
+Assumptions 
+\begin{itemize}
+\item Random assignment: $(Y_i(1), Y_i(0)) \perp\!\!\!\perp D_i$
+\item Conditional independence assumption: $(Y_i(1), Y_i(0)) \perp\!\!\!\perp D_i|X_i$
+\item Selection on unobservables: we need to find an instrument $Z_i$ that satisfies validity ($(Y_i(1), Y_i(0), u_i) \perp\!\!\! \perp Z_i|X_i$), relevancy, and monotonicity (No defiers are observed)
+\begin{itemize}
+\item MTE:  $Z_i$ should have a continuous support. It would also be ideal to have the propensity score take the value from $[0,1]$
+\item LATE:  A binary variable for a $Z_i$ would be sufficient
+\end{itemize}
+\item Regression discontinuity: Jump in propensity, continuous distribution for $X_i, W_i$. Also, the continuity of potential outcomes at $W_i=c$ 
+\[
+E[Y_i(d)|X_i, W_i=c^+]=E[Y_i(d)|X_i, W_i=c^-]=E[Y_i(d)|X_i, W_i=c]
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Treatment Effect}
+Identification Tactics
+\begin{itemize}
+\item Random assignment:  In this case, we can back out ATE of all observation using  $E[Y_i(d)|D_i=d]=E[Y_i(d)|D_i=d']$
+\item Conditional independence assumption: We can back out is the ATE for those whose $X_i=x$.
+\item Selection on unobservables: We identify ATE only on compliers
+\begin{itemize}
+\item MTE: $E[Y_i(1)-Y_i(0)|u_i=p, X_i]=\frac{\partial E[Y_i|p(x,z)=p, X_i]}{\partial p}$
+\item LATE: \footnotesize{$E[Y_i(1)-Y_i(0)|p(x,z)<u_i<p(x,z'),X_i]=\frac{E[Y_i|z',X_i]-E[Y_i|z,X_i]}{E[D_i|z',X_i]-E[D_i|z,X_i]}$}\normalsize
+\end{itemize}
+\item Regression discontinuity: ATE for the observations within the bandwidth around the cutoff of the forcing variables
+\[
+E[Y_i(1)-Y_i(0)|X_i,W_i=c]=\frac{E[Y_i|X_i, c^+]-E[Y_i|X_i, c^-]}{\Pr(D_i=1|X_i, c^+)-\Pr(D_i=1|X_i, c^-)}
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Treatment Effect}
+Implementation
+\begin{itemize}
+\item  Random assignment: OLS $Y_i=\beta+\gamma D_i+\epsilon_i$
+\item Conditional independence assumption: Matching, IPW, DID
+\begin{itemize}
+\item DID when there is a clear before and after and separation of treatment and control
+\end{itemize}
+\item Selection on unobservables: Regress $D$ on $Z$ and $X$ to get $\hat{p}$
+\begin{itemize}
+\item MTE: Regress $Y$ onto $X$ and $\hat{p}$ flexibly (hopefully have squared or cubed terms) or with local linear regression
+\item LATE: Regress $Y$ on $X$ and the predicted $D$ in a 2SLS estimation
+\end{itemize}
+\item Regression discontinuity: No overlaps above and below the cutoff
+\begin{itemize}
+\item Nonparametrics: Local polynomial with IK bandwidth 
+\item Parametrics: Run regressions separately or in one go with
+\small{\[
+Y_i=X_i\beta + X_i\cdot 1(W_i\geq c)\gamma+X_i\cdot (c-W_i)\delta+ X_i\cdot (c-W_i)\cdot 1(W_i\geq c)\mu+\epsilon_i
+\]}\normalsize
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Final words}
+Last minute tips
+\begin{itemize}
+\item Have resources at the ready: Lecture notes, Recitation notes, external sources you found through searching...
+\item Nail down on which program you would like to use
+\item Even if seemingly new concepts pop up, they can be mapped to what we have learned in class.
+\item Moreover, you have enough time to write up your answers. Do not panic and work through the question step-by-step
+\item You have worked very hard throughout this year. You have what it takes to succeed in the course this semester. 
+\item So just don't lose your mind for one week
+\item And after it is all over, take at least a week or two off from your work
+\scriptsize{\begin{itemize}
+\item[...] Normally, I would've recommended getting out of NYC and travelling around, but we are in a pandemic....so do something else..
+\end{itemize}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\centering
+\LARGE{... and see you (hopefully face-to-face) on September!}
+\end{frame}
+%%%%%%%%%%%
+\end{document}

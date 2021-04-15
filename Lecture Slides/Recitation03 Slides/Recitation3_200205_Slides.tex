@@ -1,0 +1,502 @@
+\documentclass{beamer}
+
+\mode<presentation>
+\usetheme{Madrid}
+\definecolor{Columbia}{RGB}{185,217,235}
+\definecolor{Columbia2}{RGB}{0,51,160}
+\definecolor{Columbia3}{RGB}{0,114,206}
+\setbeamercolor{title}{fg=Columbia2}
+\setbeamercolor{frametitle}{fg=Columbia2}
+\setbeamercolor{block title}{bg=Columbia, fg=Columbia2}
+%\setbeamercolor{block body}{fg=Columbia2}
+\setbeamercolor{structure}{fg=Columbia}
+\setbeamercolor{item projected}{fg=white}
+\setbeamercolor{item}{fg=Columbia2}
+\setbeamercolor{subitem}{fg=Columbia2}
+\setbeamercolor{section in toc}{fg=Columbia}
+\setbeamercolor{description item}{fg=Columbia}
+\setbeamercolor{caption name}{fg=Columbia}
+\usepackage{graphics}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{multirow, makecell}
+\usepackage{float}
+\usepackage{fancyvrb}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{adjustbox}
+\usepackage{hyperref}
+
+%\hypersetup{
+%colorlinks=true,
+%linkcolor=black,
+%filecolor=green, 
+%urlcolor=blue,
+%}
+\beamertemplatenavigationsymbolsempty
+\setbeamertemplate{footline}[page number]
+\setbeamercolor{page number in head/foot}{fg=black}
+\setbeamertemplate{headline}{}
+\makeatletter
+\let\@@magyar@captionfix\relax
+\makeatother
+
+
+\title[Econometrics 2]{Introduction to Econometrics 2: Recitation 3} % Change this regularly
+\author{Seung-hun Lee}
+\institute{Columbia University}
+
+\date{February 5th, 2020}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Limited Information Maximum Likelihood (LIML)
+\begin{itemize}
+\item Assume a data generating process
+\[
+y_ i = \beta_1' x_{1i}+ \beta_2' x_{2i}+e_i,\  (x_{1i}\in\mathbb{R}^{k_1}, x_{1i}\in\mathbb{R}^{k_2})
+\]
+where $E(x_{1i}e_i)=0$, but $E(x_{2i}e_i)\neq0$
+\item A \textbf{limited information maximum likelihood (LIML) estimator} derives the maximum likelihood estimator for the joint distribution of $(y_i, x_{2i})$ using structural equation of $y_i$ and the reduced form equation for $x_{2i}$. 
+\begin{itemize}
+\item Full information maximum likelihood (FIML) requires structural equation for $x_{2i}$ as well. 
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+So why do we want to use them?
+\begin{itemize}
+\item When the number of the instruments are fixed, 2SLS and LIML have the same asymptotic distribution
+\item When there is a problem of weak instrument variable or too many instrumental variables, it can be shown that 2SLS becomes biased towards OLS
+\begin{itemize}
+\item Pischke's lecture slides (link to it in the recitation notes and here: \url{http://econ.lse.ac.uk/staff/spischke/ec533/Weak\%20IV.pdf}) show that LIML performs better, whereas 2SLS bias approaches that of OLS in presence of weak IV or too many IV
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Derivation
+\begin{itemize}
+\item  Assume that there is a $z_i = \begin{pmatrix} x_{1i}\\ z_{2i}\end{pmatrix}\in\mathbb{R}^l$ where $E(z_ie_i)=0$.
+\item The reduced for for $x_{2i}$ can be shown as
+\[
+x_{2i}=\Gamma_{12}'x_{1i}+\Gamma_{22}'z_{2i}+u_{2i},\  (\Gamma_{12}'\in\mathbb{R}^{k_2\times k_1}, \Gamma_{22}'\in\mathbb{R}^{k_2\times (l-k_1)},z_{2i}\in\mathbb{R}^{l-k_1})
+\]
+\item By putting the structural and reduced form equation together in a matrix form, we get
+\[
+\underbrace{\begin{pmatrix}1 &- \beta_2' \\ 0  & I_{k_2} \end{pmatrix}}_{=A}\underbrace{\begin{pmatrix} y_i \\ x_{2i} \end{pmatrix}}_{=w_i}
+= \underbrace{\begin{pmatrix}\beta_1' &0 \\ \Gamma_{12}'  & \Gamma_{22}' \end{pmatrix}}_{=B}\underbrace{\begin{pmatrix} x_{1i} \\ z_{2i} \end{pmatrix}}_{z_i} + \underbrace{\begin{pmatrix} e_i \\ u_{2i} \end{pmatrix}}_{=\eta_i}
+\]
+\item  To use the maximum likelihood approach, we need some assumptions on $\eta_i$. Specifically, we assume that $\eta_i$ is conditionally IID normal and
+\[
+\eta_i |z_i\sim N(0,\Sigma_\eta)
+\]
+If we apply these facts, then we can derive the log-likelihood function for $\eta_i$
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Step-by-step: 1.\textbf{Re-express the PDF}
+\begin{itemize}
+\item   The PDF pf $\eta_i$ is
+\[
+(2\pi)^{-\frac{k_2+1}{2}}\det(\Sigma)^{-\frac{1}{2}}\times e^{-\frac{1}{2}(\eta_i)'\Sigma_\eta^{-1}(\eta_i)}
+\]
+\item Also, since $w_i|z_i \sim N(A^{-1}Bz_i, A^{-1}\Sigma_\eta A^{-1})$, note that $\chi_i=w_i-A^{-1}Bz_i$ is also another normal distribution. (conditional on $z_i$), we can write the pdf for $\chi_i$ 
+\item Lastly, notice that $\eta_i = A\chi_i$, Then we can apply Jacobian transformation to write a PDF for $w_i$ as
+\[
+(2\pi)^{-\frac{k_2+1}{2}}\det(\Sigma)^{-\frac{1}{2}}\times e^{-\frac{1}{2}(Aw_i-Bz_i)'\Sigma_\eta^{-1}(Aw_i-Bz_i)}|A|
+\]
+\item Since $\det(A)=1$, we can omit $|A|$
+\item By IID assumption, the log likelihood for $i=1,...,n$ becomes
+\[
+C - \frac{n}{2}\log(\det(\Sigma_\eta)) - \frac{1}{2}\sum_{i=1}^n(Aw_i-Bz_i)'\Sigma_\eta^{-1}(Aw_i-Bz_i)
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Step-by-step: 2. \textbf{Concentrating out}:
+\begin{itemize}
+\item   To find $A,B$ that maximizes the log - likelihood, we concentrate out the $\Sigma_\eta$ term by using its estimator,
+\[
+\widehat{\Sigma}_\eta=\frac{1}{n}\sum_{i=1}^n(Aw_i-Bz_i)(Aw_i-Bz_i)'
+\]
+\item Then plug this estimator into the log-likelihood function to get
+\[
+C - \frac{n}{2}\log(\det(\widehat{\Sigma}_\eta)) - \frac{1}{2}\sum_{i=1}^n(Aw_i-Bz_i)'\widehat{\Sigma}_\eta^{-1}(Aw_i-Bz_i)
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Step-by-step: 2. \textbf{Concentrating out}:
+\begin{itemize}
+\item Since the last term is a scalar, we can take
+\[
+(Aw_i-Bz_i)'\widehat{\Sigma}_\eta^{-1}(Aw_i-Bz_i)=tr\left((Aw_i-Bz_i)'\widehat{\Sigma}_\eta^{-1}(Aw_i-Bz_i)\right)
+\]
+\item Also, using the fact that $tr(AB)=tr(BA)$, 
+\[
+tr\left((Aw_i-Bz_i)'\widehat{\Sigma}_\eta^{-1}(Aw_i-Bz_i)\right)=tr\left(\widehat{\Sigma}_\eta^{-1}(Aw_i-Bz_i)(Aw_i-Bz_i)'\right)
+\]
+\item This reduced the likelihood function to
+\small{\begin{gather*}
+C - \frac{n}{2}\log(\det(\widehat{\Sigma}_\eta)) - \frac{1}{2}tr\left(\widehat{\Sigma}_\eta^{-1}\sum_{i=1}^n(Aw_i-Bz_i)(Aw_i-Bz_i)'\right) \\\
+= C-\frac{n}{2}\log(\det(\widehat{\Sigma}_\eta))-\frac{n(k_2+1)}{2}
+\end{gather*}}\normalsize
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Step-by-step: 3.  \textbf{Maximize}
+\begin{itemize}
+\item The only thing left to maximize over now is $-\frac{n}{2}\log(\det(\widehat{\Sigma}_\eta))$. This is equivalent to maximizing
+\footnotesize{\begin{gather*}
+-\det\left(\frac{1}{n}\sum_{i=1}^n(Aw_i-Bz_i)'(Aw_i-Bz_i)\right)
+\\ =
+-\det\left(\frac{1}{n}\sum_{i=1}^n\begin{pmatrix} y_ i - \beta_1'x_{1i}-\beta_2x_{2i} \\ x_{2i}-\Gamma_{12}'x_{1i}-\Gamma_{22}'z_{2i} \end{pmatrix}\begin{pmatrix} y_ i - \beta_1'x_{1i}-\beta_2x_{2i} \\ x_{2i}-\Gamma_{12}'x_{1i}-\Gamma_{22}'z_{2i} \end{pmatrix}'\right)
+\end{gather*}}\normalsize
+The combination of $\beta$ and $\Gamma$ that maximizes this is the LIML estimator.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+$k$-class Estimators
+\begin{itemize}
+\item Another way to compute the LIML estimator is to use a $k$-class estimator with a particular choice for $k$. In general, $k$-class estimator is defined as 
+\[
+\hat{\beta}_k=\arg\min_\beta(y-X\beta)'(I_n-kM_Z)(y-X\beta)
+\]
+where $M_Z = I-Z(Z'Z)^{-1}Z'=I-P_Z$.
+\item The other way to express this, after some matrix differentiation, is 
+\begin{gather*}
+-2X'y+2kX'M_Zy+2(X'X)\beta-2k(X'M_ZX)\beta=0\\
+\iff (X'(I_n-kM_Z)X)\beta=X'(I_n-kM_Z)y\\
+\implies \hat{\beta}_k= (X'(I_n-kM_Z)X)^{-1}(X'(I_n-kM_Z)y)
+\end{gather*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+$k$-class Estimators
+\begin{itemize}
+\item In fact, we can show that OLS $(k=0)$ and 2SLS $(k=1)$ are $k$-class estimators.
+\item LIML is a $k$-class estimator with a parameter choice of some $k>1$. What we need to do find the associated value of $k$
+\item To do so, define
+\[
+W=(y\ \ X_2)\in \mathbb{R}^{n\times (k_2+1)}, \ M_1 = I- X_1(X_1'X_1)^{-1}X_1'
+\]
+Then we compute the minimum eigenvalue of 
+\[
+(W'M_1W)(W'M_ZW)^{-1}
+\]
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+$k$-class Estimators
+\begin{itemize}
+\item This minimum eigenvalue will be our choice of $k$, which will be denoted as $\hat{k}$, and the LIML estimator would be
+\[
+\hat{\beta}_{LIML}=(X'(I_n-\hat{k}M_Z)X)^{-1}(X'(I_n-\hat{k}M_Z)y)
+\]
+\item From here, we can also find that LIML is also a type of an IV estimator. We can see that by rewriting above equation as
+\[
+\hat{\beta}_{LIML}=(\tilde{X}'X)^{-1}(\tilde{X}'y)
+\]
+where $\tilde{X}=(I_n-\hat{k}M_Z)X$. This also hints that the asymptotic properties of LIML and some other types of IV estimators are similar. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Asymptotics of LIML
+\begin{itemize}
+\item  Given $\hat{\beta}_{LIML}=(X'(I_n-\hat{k}M_Z)X)^{-1}(X'(I_n-\hat{k}M_Z)y)$
+\footnotesize{\[
+\begin{aligned}
+\hat{\beta}_{LIML}-\beta &= (X'(I_n-\hat{k}M_Z)X)^{-1}(X'(I_n-\hat{k}M_Z)e)\\
+& =(X'(P_Z-(\hat{k}-1))M_Z)X)^{-1}(X'(P_Z-(\hat{k}-1))e) \\
+& (\because I-M_Z=P_Z, \implies I-\hat{k}M_Z=P_Z-(\hat{k}-1)M_Z)\\
+  \sqrt{n}(\hat{\beta}_{LIML}-\beta)&=\left(\frac{X'P_ZX}{n}-(\hat{k}-1)\frac{X'M_ZX}{n}\right)^{-1}\left(\frac{X'P_ZX}{\sqrt{n}}-(\hat{k}-1)\frac{X'M_Ze}{\sqrt{n}}\right)\\
+\end{aligned}
+\]}\normalsize
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Asymptotics of LIML
+\begin{itemize}
+\item Note that
+\begin{itemize}
+\item Anderson and Rubin (1949) shows that $\hat{k}-1\xrightarrow{p}0$, which we accept as given. 
+\item $\frac{X'M_ZX}{n}=\frac{X'X}{n}-\frac{X'P_ZX}{n}=\frac{X'X}{n}-\frac{X'P_Z'P_ZX}{n}=\frac{X'X}{n}-\frac{(P_ZX)'(P_ZX)}{n}\leq\frac{X'X}{n}\xrightarrow{p}E(x_ix_i')$. Therefore, $\frac{X'M_ZX}{n}$ is bounded (and thus $O_p(1)$)
+\item $\frac{X'M_Ze}{\sqrt{n}}$ converges in distribution to a normal distribution (CLT), so it is $O_p(1)$
+\item From the third and first points, we can infer that $(\hat{k}-1)\frac{X'M_Ze}{\sqrt{n}}=o_p(1)$
+\end{itemize}
+\item Combining these leads to the result that 
+\[
+ \sqrt{n}(\hat{\beta}_{LIML}-\beta) =\left(\frac{X'P_ZX}{n}\right)^{-1}\frac{X'P_ZX}{\sqrt{n}} +o_p(1)
+\]
+which is equivalent to $ \sqrt{n}(\hat{\beta}_{2SLS}-\beta) +o_p(1)$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Control Function Method
+\begin{itemize}
+\item This is another way to derive a 2SLS estimator. 
+\item  will assume $E(x_{1i}e_i)=0, E(x_{2i}e_i)\neq0$ and write the structural and reduced form regression as
+\begin{gather*}
+y_i = x_{1i}'\beta_1 + x_{2i}'\beta_2+e_i \tag{Structural}\\
+x_{2i}=\Gamma_{12}'x_{1i}+\Gamma_{22}'z_{2i}+u_{2i} \tag{Reduced Form}\\
+\end{gather*}
+\item We have a $z_i\in( x_{1i}\  z_{2i})'\in\mathbb{R}^l$ that satisfies $E(z_ie_i)=0$
+\item The key driving idea for the control function method is that we can write $E(x_{2i}e_i)$ differently. Specifically, 
+\[
+\begin{aligned}
+E[x_{2i}e_i]&= E[(\Gamma_{12}'x_{1i}+\Gamma_{22}'\beta_2+u_{2i})e_i]\\
+&= \Gamma_{12}'E(x_{1i}e_i)+\Gamma_{22}'E(z_{2i}e_i)+E(u_{2i}e_i)\\
+&= E(u_{2i}e_i) \implies \therefore E[x_{2i}e_i]\neq 0 \iff E[u_{2i}e_i]\neq 0 
+\end{aligned}
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Control Function Method
+\begin{itemize}
+\item We consider a linear projection of $e_i$ onto $u_{2i}$, which we write as
+\[
+e_i  = u_{2i}'\alpha+\epsilon_i \tag{LP}
+\]
+where $E(u_{2i}\epsilon_i)=0$ and the population analogue of $\alpha=E(u_{2i}u_{2i}')^{-1}E(u_{2i}e_i)$
+\item Substitute the $e_i$ term in the (Structural) equation with the (LP) equation to get
+\[
+y_i = x_{1i}'\beta_1 + x_{2i}'\beta_2+ u_{2i}'\alpha+\epsilon_i   \tag{CFA}
+\]
+where the following are satisfied
+\[
+E[x_{1i}\epsilon_i]=E[x_{2i}\epsilon_i]=E[u_{2i}\epsilon_i]=0
+\]
+Why? Separate slide!
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Control Function Method
+\begin{itemize}
+\item So the key takeaway is that now $x_{2i}$ is exogenous with $\epsilon_i$. In words, $x_{2i}$ is correlated with $e_i$ through $u_{2i}$ and $\epsilon_i$ is the error after $e_i$ has been projected onto $u_{2i}$. 
+\item Usual Steps
+\begin{enumerate}
+\item \textbf{Obtain $\hat{u}_{2i}$}: This is done by regressing (Reduced Form) equation. 
+\item \textbf{Work with (CFA)}: However, instead of $u_{2i}$, use $\hat{u}_{2i}$. Then we can run an OLS on the REWRITTEN (CFA) equation. 
+\end{enumerate}
+\item Once this is done, we can show that the estimates from control function approach is numerically identical to 2SLS
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+Control Function Method
+\begin{itemize}
+\item One thing to note is that with this setup, we can conduct a test of endogeneity. Formally we want to test
+\[
+H_0: E(x_{2i}e_i)=0, \ H_1:E(x_{2i}e_i)\neq0
+\]
+\item If it is the case that $E(x_{2i}e_i)=0$, then $E(u_{2i}e_i)=0$. Then, by how we constructed $\alpha$, this implies that $\alpha=0$. We can then show that the Wald statistics, under $H_0$, is distributed as
+\[
+\hat{\alpha}'(var(\hat{\alpha}))^{-1}\hat{\alpha}\xrightarrow{d}\chi^2_{k_2}
+\]
+\item To test the null against the alternative hypothesis, define $C_{1-\alpha}$ as $\Pr(\chi_{k_2}^2\leq C_{1-\alpha})=1-\alpha$. Then, we can reject the $H_0$ hypothesis if $\hat{\alpha}'(var(\hat{\alpha}))^{-1}\hat{\alpha}>C_{1-\alpha}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics on Instrumental Variables}
+Hausmann Tests
+\begin{itemize}
+\item Assume the following data generating process
+\[
+y_i = x_{1i}'\beta_1 + x_{2i}'\beta_2+e_i
+\]
+and we are interested in checking the exogeneity / endogeneity of $x_{2i}$. 
+\item So we test $H_0: E(x_{2i}e_i)=0$ against $H_1:E(x_{2i}e_i)\neq0$. Consider these properties of 2SLS and OLS estimators
+\begin{itemize}
+\item $\hat{\beta}_{OLS}$: Consistent and minimal variance under $H_0$, inconsistent under $H_1$
+\item $\hat{\beta}_{2SLS}$:  Consistent in either $H_0$ or $H_1$. Inefficient under $H_0$. 
+\end{itemize}
+\item Under $H_0$, $\sqrt{n}(\hat{\beta}_{2SLS}-\hat{\beta}_{OLS})$ converges in distribution to $N(0, var(\hat{\beta}_{2SLS}-\hat{\beta}_{OLS}))$
+\item Hausmann also shows that in $H_0$, $var(\hat{\beta}_{2SLS}-\hat{\beta}_{OLS})=var(\hat{\beta}_{2SLS})-var(\hat{\beta}_{OLS})$ holds in general
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics on Instrumental Variables}
+Hausmann Tests
+\begin{itemize}
+\item Given this, we can write the Hausmann test statistic as 
+\[
+(\hat{\beta}_{2SLS}-\hat{\beta}_{OLS})'(var(\hat{\beta}_{2SLS})-var(\hat{\beta}_{OLS}))^-(\hat{\beta}_{2SLS}-\hat{\beta}_{OLS})\xrightarrow{d}\chi_{k_2}^2
+\]
+where $(var(\hat{\beta}_{2SLS})-var(\hat{\beta}_{OLS}))^-$ indicates a generalized inverse.
+\item We can use the test statistic, construct a critical value and reject/not reject $H_0$ based on comparison.
+\item Note that generalized inverse is required since $(var(\hat{\beta}_{2SLS})-var(\hat{\beta}_{OLS}))$ is usually not a full (column) rank matrix. I leave further explanation to my recitation notes.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics on Instrumental Variables}
+Subset Endogeneity Tests
+\begin{itemize}
+\item We break down $x_{2i}$ into two parts - one that is `potentially' endogenous ($x_{2i}$) and one that is endogenous for sure ($x_{3i}$)
+\item Then, we again test for  $H_0: E(x_{2i}e_i)=0$ against $H_1:E(x_{2i}e_i)\neq0$
+\item Using a control function approach, with following setup
+\begin{gather*}
+y_i = x_{1i}'\beta_1 + x_{2i}'\beta_2+x_{3i}'\beta_3+e_i \tag{Structural}\\
+x_{2i}=\Gamma_{2}'z_{i}+u_{2i} \tag{Reduced Form 2}\\
+x_{3i}=\Gamma_{3}'z_{i}+u_{3i} \tag{Reduced Form 3}\\
+\end{gather*}
+\item We then project $e_i$ onto $u_{2i}, u_{3i}$ to obtain
+\[
+e_i = u_{2i}'\alpha_2 + u_{3i}'\alpha_3 + \epsilon_i \tag{LP2}
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics on Instrumental Variables}
+Subset Endogeneity Tests
+\begin{itemize}
+\item We can show that the following is satisfied
+\[
+\begin{pmatrix}E(u_{2i}u_{2i}') & E(u_{2i}u_{3i}')\\E(u_{3i}u_{2i}') & E(u_{3i}u_{3i}')\end{pmatrix}\begin{pmatrix} \alpha_2 \\ \alpha_3\end{pmatrix} = \begin{pmatrix} E(u_{2i}e_i) \\ E(u_{3i}e_i)\end{pmatrix}
+\]
+\item  Control function approach would require us to apply an OLS to
+\[
+y_i = x_{1i}'\beta_1 + x_{2i}'\beta_2+x_{3i}'\beta_3+ u_{2i}'\alpha_2 + u_{3i}'\alpha_3 + \epsilon_i \tag{CFA2}
+\]
+\item As before, $E(x_{2i}e_i)=0$ implies $E(u_{2i}e_i)=0$. This allows us to replace the $H_0$ with
+\[
+H_0: E[u_{2i}u_{2i}']\alpha_2+E[u_{2i}u_{3i}']\alpha_3=0
+\]
+\item This is a special case of $R\beta=c$ type of hypothesis test. However, since we cannot usually know what the true value of $u_{2i}, u_{3i}$ are, we use the residuals, and replace $R$ with $\widehat{R}$ constructed from the sample analogue using residuals. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics on Instrumental Variables}
+Overidentification Test
+\begin{itemize}
+\item Consider the following setup
+\[
+y_i = x_i'\beta+e_i, \ (\dim(x_i)=k<\dim(z_i)=l) 
+\]
+\item We can test for the validity of the instruments by testing $H_0: E(z_ie_i)=0$ vs. $H_1: E(z_ie_i)\neq0$.
+\item To do this, we construct a linear projection equation by projecting $e_i$ onto $z_i$, obtaining
+\[
+e_i=z_i'\alpha+\epsilon_i
+\]
+Thus, $\alpha=E(z_iz_i')^{-1}E(z_ie_i)$
+\item Therefore,  $H_0: \alpha=0$ vs. $H_1: \alpha\neq0$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics on Instrumental Variables}
+Overidentification Test
+\begin{itemize}
+\item This leaves us with the challenge of estimating $\alpha$
+\begin{enumerate}
+\item \textbf{Obtain $\hat{e}_i$}: This can be done using 2SLS estimates of $\beta$. As a result, 
+\[
+\hat{e}_i = y_i-x_i'\hat{\beta}_{2SLS} \implies \hat{e}=y-X\hat{\beta}_{2SLS}
+\]
+\item \textbf{Obtain $\hat{\alpha}$}: Replace $e$ with $\hat{e}$ to get
+\[
+\hat{\alpha} = (Z'Z)^{-1}Z'\hat{e}
+\]
+\item \textbf{Sargan Test}: We will assume homoskedasticity (otherwise, the test statistic does not converge to $\chi^2$ distribution). Then we make use of the following test statistic
+\[
+S=\hat{\alpha}'(var(\hat{\alpha}))^{-}\hat{\alpha}=\frac{\hat{e}'Z(Z'Z)^{-1}Z'\hat{e}}{\hat{\sigma}^2}
+\]
+where $\hat{\sigma}^2$ can be obtained from two paths - one using $\frac{1}{n}\hat{e}'\hat{e}$ and the other using $\frac{1}{n}\hat{\epsilon}'\hat{\epsilon}=\frac{1}{n}(\hat{e}-Z\hat{\alpha})'(\hat{e}-Z\hat{\alpha})$. While they are slightly different in that the first estimate has larger variances, they are asymptotically equal. Under the null, $S\xrightarrow{d}\chi_{l-k}^2$
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics on Instrumental Variables}
+Weak IV Test
+\begin{itemize}
+\item Assume that the structural and reduced form equations are (we are working with a scalar regressors)
+\begin{gather*}
+y_i = x_i\beta+ e_i \\ x_i=z_i\gamma+u_i
+\end{gather*}
+\item We say that there is a problem of weak instrument if $\gamma\simeq0$.
+\item  This can cause the 2SLS estimates to be biased and the distribution to be affected. 
+\item Let $\gamma=\frac{\mu}{\sqrt{n}}$. For simplicity, I will assume
+\begin{itemize}
+\footnotesize{\item $var\left(\begin{pmatrix}e_i \\ u_i \end{pmatrix}| z_i\right)=\begin{pmatrix}1 & \rho \\ \rho &1\end{pmatrix}=\Sigma$
+\item $E(z_i^2)=1$
+\item $\frac{1}{\sqrt{n}}\sum_{i=1}^n\begin{pmatrix}z_ie_i \\ z_iu_i\end{pmatrix}\xrightarrow{d}\begin{pmatrix}\xi_1 \\ \xi_2\end{pmatrix}=N(0,\Sigma)$}\normalsize
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Topics on Instrumental Variables}
+Weak IV Test
+\begin{itemize}
+\item Now I will show that neither OLS nor IV estimator is not consistent. 
+\begin{itemize}
+\item OLS: Note that $\hat{\beta}_{OLS}-\beta$ can be written as $\frac{n^{-1}\sum_{i=1}^n x_ie_i}{n^{-1}\sum_{i=1}^nx_i^2}$, equivalent to
+\footnotesize{\[
+\begin{aligned}
+\frac{n^{-1}\sum_{i=1}^n x_ie_i}{n^{-1}\sum_{i=1}^nx_i^2}&=\frac{n^{-1}\sum_{i=1}^n (z_i\gamma+u_i)e_i}{n^{-1}\sum_{i=1}^n(z_i\gamma+u_i)^2}\\
+&=\frac{n^{-1}\sum_{i=1}^n u_ie_i}{n^{-1}\sum_{i=1}^nu_i^2}+o_p(1)\\
+&\xrightarrow{p}E(u_ie_i)/E(u_i^2)=\rho\\
+\end{aligned}
+\]}\normalsize
+\item IV: For $\hat{\beta}_{IV}-\beta$, we can write $\frac{n^{-1/2}\sum_{i=1}^n z_ie_i}{n^{-1/2}\sum_{i=1}^nz_ix_i}$ or equivalently
+\footnotesize{\[
+\begin{aligned}
+\hat{\beta}_{IV}-\beta&=\frac{n^{-1/2}\sum_{i=1}^n z_ie_i}{n^{-1/2}\sum_{i=1}^nz_i(z_i\gamma+u_i)}\\
+&=\frac{n^{-1/2}\sum_{i=1}^n z_ie_i}{n^{-1/2}\sum_{i=1}^nz_iu_i+n^{-1}\sum_{i=1}^n z_i^2\mu}\xrightarrow{d}\frac{\xi_1}{\xi_2+\mu}
+\end{aligned}
+\]}\normalsize
+which is not centered at 0, making it inconsistent. 
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%
+\end{document}
