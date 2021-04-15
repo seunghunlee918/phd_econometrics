@@ -15,7 +15,7 @@ The following topics are covered at each recitation
 |Recitation 5  |  GMM diagnistics tests, Panel: FE/RE  |
 |Recitation 6  |  Panel: RE, dynamic panel data models  |
 |Recitation 7  |  Panel: Intro to factor analysis and other topics  |
-|Recitation 8  |  Bootstraps and multiple hypothesis testing  |
+|Recitation 8  |  Bootstraps and multiple hypotheses testing  |
 |Recitation 9  |  Quantile regression, non-parametric regression |
 |Recitation 10 |  Semiparametric regression, Treatment effects: Random assignment, conditional independence, DiD |
 |Recitation 11 |  Treatment effects: Violation of conditional independence, MTE and LATE  |
