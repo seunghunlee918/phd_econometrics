@@ -6,5 +6,5 @@ This is the repository containing the files used to create the TeX files for the
 
 
 ### Lecture Slides
-I have made separate slides for each sessions. Each recitation covers roughly the same topic as in the recitation notes. <br>
+I have made separate slides for each sessions. Each recitation covers roughly the same topic as in the recitation notes. Note that I do not have the slides for Recitation 1 as I made the slides starting from the second recitation.  <br>
 The version I used to upload after class had the annotations that I have made during the lecture. The files uploaded here does not include such files. For those wishing to see the annotated files, please contact me at sl4436@columbia.edu
